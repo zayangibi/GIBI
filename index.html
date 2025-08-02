@@ -1,0 +1,1527 @@
+# GIBI Cryptocurrency Mystery Website - Complete Code
+
+## 🚀 MAIN HOME PAGE (client/src/pages/home.tsx)
+```tsx
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import GlitchText from "@/components/glitch-text";
+import FadeInSection from "@/components/fade-in-section";
+import CountdownTimer from "@/components/countdown-timer";
+import { AlertTriangle, Eye, FileX, Activity, Lock, CheckCircle, Shield, Skull, Zap, Globe, Database, ExternalLink } from "lucide-react";
+
+interface VaultJoinResponse {
+  message: string;
+  id: string;
+}
+
+export default function Home() {
+  const [email, setEmail] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [showVaultAccess, setShowVaultAccess] = useState(false);
+  const { toast } = useToast();
+
+  const vaultMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await apiRequest("POST", "/api/vault/join", { email });
+      return response.json() as Promise<VaultJoinResponse>;
+    },
+    onSuccess: (data) => {
+      setShowVaultAccess(true);
+      setEmail("");
+      toast({
+        title: "Vault Access Granted",
+        description: "You are now cleared for classified intelligence.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Access Denied",
+        description: error.message || "Invalid email format",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+    vaultMutation.mutate(email);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied",
+        description: "Contract address copied to clipboard",
+      });
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white font-mono static-bg">
+      {/* Background Static Effect */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 opacity-10 bg-noise"></div>
+      </div>
+
+      {/* Vault Access Modal */}
+      {showVaultAccess && (
+        <motion.div 
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.div 
+            className="bg-gray-900 border border-terminal p-8 rounded-lg max-w-md w-full document-shadow"
+            initial={{ scale: 0.8, y: 50 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-center">
+              <motion.div 
+                className="text-terminal text-6xl mb-4"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Shield className="inline-block w-16 h-16" />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-terminal mb-4">
+                <GlitchText text="VAULT ACCESS GRANTED" />
+              </h3>
+              <p className="text-gray-300 mb-6">
+                You are now part of an exclusive group. When Project GIBI activates, you will receive your sealed file containing classified intelligence.
+              </p>
+              <div className="bg-black p-4 rounded border border-terminal mb-6">
+                <div className="text-xs text-gray-500 mb-2">CLEARANCE LEVEL</div>
+                <div className="text-terminal font-bold text-xl">COSMIC - COMPARTMENTED</div>
+              </div>
+              <button 
+                onClick={() => setShowVaultAccess(false)}
+                className="bg-terminal text-black px-6 py-2 rounded font-bold hover:bg-green-400 transition-colors"
+              >
+                ACKNOWLEDGED
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Main Container */}
+      <div className="relative z-10">
+        {/* Header Section */}
+        <header className="min-h-screen flex items-center justify-center px-4">
+          <div className="text-center max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+            >
+              <motion.div 
+                className="flex justify-center items-center gap-4 text-danger text-3xl mb-6"
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <Skull className="inline-block w-10 h-10" />
+                <div className="text-base tracking-[0.5em] font-bold">THREAT LEVEL: MAXIMUM</div>
+                <Skull className="inline-block w-10 h-10" />
+              </motion.div>
+              
+              <h1 className="text-5xl md:text-7xl font-bold mb-8 terminal-glow text-terminal">
+                <GlitchText text="PROJECT GIBI" />
+              </h1>
+
+              <CountdownTimer 
+                targetDate={new Date('2025-08-19T00:00:00-05:00')} 
+                label="81 YEARS OF SILENCE ENDS NOW"
+              />
+              
+              <div className="text-2xl md:text-3xl text-danger mb-6 font-bold">
+                <GlitchText text="CONTAINMENT BREACH DETECTED" />
+              </div>
+              
+              <div className="text-xl md:text-2xl text-gray-300 mb-8 scan-line italic">
+                "This isn't a cryptocurrency. This is a weapons program that escaped."
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-gray-900 border border-danger p-4 rounded">
+                  <div className="text-danger font-bold text-sm">CLASSIFICATION</div>
+                  <div className="text-white">TOP SECRET / SCI</div>
+                </div>
+                <div className="bg-gray-900 border border-classified p-4 rounded">
+                  <div className="text-classified font-bold text-sm">COMPARTMENT</div>
+                  <div className="text-white">COSMIC CLEARANCE</div>
+                </div>
+                <div className="bg-gray-900 border border-terminal p-4 rounded">
+                  <div className="text-terminal font-bold text-sm">STATUS</div>
+                  <div className="text-white">ACTIVE THREAT</div>
+                </div>
+              </div>
+              
+              <div className="font-sans text-sm text-gray-500 tracking-widest bg-black p-3 rounded border border-gray-700">
+                <Shield className="inline-block w-4 h-4 mr-2" />
+                UNAUTHORIZED ACCESS IS A FEDERAL CRIME
+              </div>
+            </motion.div>
+          </div>
+        </header>
+
+        {/* Discovery Section */}
+        <FadeInSection>
+          <section className="py-20 px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="text-danger font-bold text-3xl mb-4 flex items-center justify-center gap-3">
+                  <Database className="w-8 h-8" />
+                  INITIAL BREACH DETECTED
+                  <Database className="w-8 h-8" />
+                </div>
+                <div className="text-gray-400">How the containment failed</div>
+              </div>
+
+              <div className="document-shadow bg-gray-950 border border-danger p-8 mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="text-danger font-bold flex items-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    ANOMALY DETECTION REPORT
+                  </div>
+                  <div className="text-xs text-gray-500">SOLANA NETWORK - MARCH 2021</div>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  <img 
+                    src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&h=600" 
+                    alt="Matrix code streams on computer screen" 
+                    className="w-full h-48 object-cover rounded-lg opacity-50" 
+                  />
+                  <div className="space-y-4">
+                    <div className="bg-black p-4 rounded border border-gray-700">
+                      <div className="text-terminal font-bold mb-2">THREAT ANALYSIS</div>
+                      <div className="text-sm text-gray-300">
+                        • Unknown origin protocol
+                        <br />• No deployment signatures  
+                        <br />• Encrypted military-grade payload
+                        <br />• Self-modifying code structure
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-800 p-6 rounded-lg border border-danger mb-6">
+                  <div className="text-danger font-bold mb-4 text-xl">INITIAL DISCOVERY</div>
+                  <p className="text-lg leading-relaxed mb-6 text-gray-200">
+                    March 15, 2021 - A dormant smart contract was detected on Solana Testnet during routine blockchain forensics. 
+                    The contract contained no standard metadata, no owner wallet, no deployment transaction history. 
+                    Deep analysis revealed only a single encrypted string embedded in the bytecode:
+                  </p>
+                  
+                  <div className="bg-black border border-terminal p-6 rounded-lg font-mono text-terminal terminal-glow mb-6">
+                    <div className="text-xs text-gray-500 mb-2">EXTRACTED PAYLOAD:</div>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: "100%" }}
+                      transition={{ duration: 4 }}
+                      viewport={{ once: true }}
+                      className="overflow-hidden whitespace-nowrap text-xl"
+                    >
+                      GIBI // SEED :: 994201 // COLD_WAR_PROTOCOL_ACTIVE
+                    </motion.div>
+                  </div>
+                  
+                  <div className="bg-danger bg-opacity-10 border border-danger p-4 rounded-lg">
+                    <div className="text-danger font-bold mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" />
+                      SECURITY ALERT
+                    </div>
+                    <p className="text-gray-200">
+                      The contract began autonomously replicating across multiple blockchain networks without human intervention. 
+                      Each replica carried the same encrypted seed but with incremental modifications to the payload structure.
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-300 text-lg">
+                  Within 72 hours, the contract had spread to 47 different blockchain networks. 
+                  No development team came forward. No social media presence existed. 
+                  The origin remained completely untraceable... until intelligence analysts made a disturbing connection.
+                </p>
+              </div>
+            </div>
+          </section>
+        </FadeInSection>
+
+        {/* CIA Document Section */}
+        <FadeInSection>
+          <section className="py-20 px-4 bg-gray-950">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="text-classified font-bold text-3xl mb-4 flex items-center justify-center gap-3">
+                  <FileX className="w-8 h-8" />
+                  CLASSIFIED INTELLIGENCE BREACH
+                  <FileX className="w-8 h-8" />
+                </div>
+                <div className="text-gray-400">The government connection revealed</div>
+              </div>
+
+              <div className="document-shadow bg-gray-900 border border-classified p-8 mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="text-classified font-bold flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    CIA MEMORANDUM - PARTIALLY DECLASSIFIED
+                  </div>
+                  <div className="text-xs text-gray-500">DOC ID: CIA-RDP80-00630A000100050001-4</div>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  <img 
+                    src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&h=800" 
+                    alt="Digital hacking matrix with binary code streams" 
+                    className="w-full h-64 object-cover rounded-lg opacity-60" 
+                  />
+                  <div className="space-y-4">
+                    <div className="bg-black p-4 rounded border border-classified">
+                      <div className="text-classified font-bold mb-2 text-sm">DOCUMENT STATUS</div>
+                      <div className="text-xs text-gray-300">
+                        • 89% Content Redacted
+                        <br />• Cold War Era Classification
+                        <br />• UFO Research Program Link
+                        <br />• Digital Containment Protocols
+                      </div>
+                    </div>
+                    <a 
+                      href="https://www.cia.gov/readingroom/document/cia-rdp80-00630a000100050001-4"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-classified bg-opacity-20 border border-classified p-4 rounded block hover:bg-opacity-30 transition-colors"
+                    >
+                      <div className="text-classified font-bold mb-2 flex items-center gap-2">
+                        <ExternalLink className="w-4 h-4" />
+                        VIEW ACTUAL CIA DOCUMENT
+                      </div>
+                      <div className="text-xs text-gray-400">Click to access official CIA archives</div>
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-800 p-6 rounded-lg border border-classified mb-6">
+                  <div className="text-classified font-bold mb-4 text-lg">INTELLIGENCE ANALYSIS</div>
+                  <p className="text-base leading-relaxed mb-6 text-gray-200">
+                    After the blockchain discovery, crypto-archaeologists cross-referenced the seed string "994201" through government databases. 
+                    The search hit a classified CIA memorandum from 1974, partially declassified in 2003 under FOIA pressure.
+                  </p>
+                  
+                  <div className="bg-black border border-classified p-6 rounded-lg mb-6">
+                    <div className="text-xs text-gray-500 mb-2">SUBJECT LINE:</div>
+                    <div className="text-classified font-bold text-base mb-4">PROJECT GIBI - PSYCHOTRONIC WARFARE APPLICATIONS</div>
+                    
+                    <div className="space-y-3 text-gray-200 font-mono text-sm">
+                      <p>CLASSIFICATION: <span className="redacted">TOP SECRET / EYES ONLY</span></p>
+                      <p>DATE: <span className="redacted">NOVEMBER</span> 15, 1974</p>
+                      <p>FROM: <span className="redacted">DIRECTORATE OF SCIENCE & TECHNOLOGY</span></p>
+                      <p>TO: <span className="redacted">SPECIAL ACTIVITIES DIVISION</span></p>
+                      <p>RE: <span className="redacted">PSYCHOLOGICAL OPERATIONS ENHANCEMENT</span></p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-200 text-base mb-4">
+                    The memo describes experimental research into "non-conventional influence mechanisms" for psychological warfare applications. 
+                    Most content remains classified, but key phrases survived the redaction process:
+                  </p>
+                  
+                  <div className="bg-black p-4 rounded border border-classified font-mono text-sm text-gray-300">
+                    "...digital frequency manipulation shows promising results for <span className="redacted">mass behavioral modification</span>. 
+                    The GIBI protocol demonstrates unprecedented effectiveness in <span className="redacted">cognitive interference patterns</span>. 
+                    Recommend immediate transition to <span className="redacted">operational deployment</span> pending containment protocols..."
+                  </div>
+                </div>
+                
+                <div className="bg-classified bg-opacity-10 border border-classified p-4 rounded-lg">
+                  <div className="text-classified font-bold mb-2 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5" />
+                    CLASSIFIED FINDING
+                  </div>
+                  <p className="text-gray-200">
+                    The memo was signed by the same research division that worked on Project MKUltra. 
+                    The timing coincides with congressional investigations that led to the program's supposed termination. 
+                    But the GIBI seed suggests the research continued in digital form.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </FadeInSection>
+
+        {/* UFO Connection Section */}
+        <FadeInSection>
+          <section className="py-20 px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="text-terminal font-bold text-3xl mb-4 flex items-center justify-center gap-3">
+                  <Eye className="w-8 h-8" />
+                  UFO RESEARCH HYPOTHESIS
+                  <Eye className="w-8 h-8" />
+                </div>
+                <div className="text-gray-400">The extraterrestrial technology connection</div>
+              </div>
+
+              <div className="document-shadow bg-gray-900 border border-terminal p-8 mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="text-terminal font-bold flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    HYPOTHESIS: NON-TERRESTRIAL ORIGINS
+                  </div>
+                  <div className="text-xs text-gray-500">CLEARANCE: COSMIC / SCI</div>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  <img 
+                    src="https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&h=600" 
+                    alt="UFO alien spacecraft in space with mysterious lights" 
+                    className="w-full h-48 object-cover rounded-lg opacity-50" 
+                  />
+                  <div className="space-y-4">
+                    <div className="bg-black p-4 rounded border border-terminal">
+                      <div className="text-terminal font-bold mb-2">ANOMALOUS CHARACTERISTICS</div>
+                      <div className="text-sm text-gray-300">
+                        • Self-replicating without input
+                        <br />• Quantum-encrypted signatures
+                        <br />• Technology exceeds known capabilities
+                        <br />• Behavior patterns suggest intelligence
+                      </div>
+                    </div>
+                    <a 
+                      href="https://www.cia.gov/readingroom/collection/ufos-fact-or-fiction"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-terminal bg-opacity-20 border border-terminal p-4 rounded block hover:bg-opacity-30 transition-colors"
+                    >
+                      <div className="text-terminal font-bold mb-2 flex items-center gap-2">
+                        <ExternalLink className="w-4 h-4" />
+                        CIA UFO RESEARCH FILES
+                      </div>
+                      <div className="text-xs text-gray-400">Official intelligence on aerial phenomena</div>
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-800 p-6 rounded-lg border border-terminal mb-6">
+                  <div className="text-terminal font-bold mb-4 text-lg">BREAKTHROUGH ANALYSIS</div>
+                  <p className="text-base leading-relaxed mb-6 text-gray-200">
+                    Independent researchers discovered that the GIBI protocol's computational patterns match declassified reports 
+                    of electronic anomalies recorded during alleged UFO encounters from 1944-1977. The correlation coefficient exceeds 99.3%.
+                  </p>
+                  
+                  <div className="bg-black border border-terminal p-6 rounded-lg mb-6">
+                    <div className="text-xs text-gray-500 mb-2">PATTERN ANALYSIS:</div>
+                    <div className="text-terminal font-bold text-base mb-4">SIGNAL INTELLIGENCE MATCH</div>
+                    
+                    <div className="space-y-3 text-gray-200 font-mono text-sm">
+                      <p>• Roswell Incident (1947): Electronic interference patterns match GIBI core algorithm</p>
+                      <p>• Washington D.C. Flyovers (1952): Radar disruption follows GIBI mathematical sequence</p>
+                      <p>• Malmstrom AFB Incident (1967): Nuclear missile computer glitches replicate GIBI protocol structure</p>
+                      <p>• Rendlesham Forest (1980): Binary code received matches GIBI encryption methodology</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-terminal bg-opacity-10 border border-terminal p-4 rounded-lg">
+                    <div className="text-terminal font-bold mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" />
+                      WORKING HYPOTHESIS
+                    </div>
+                    <p className="text-gray-200">
+                      GIBI may represent reverse-engineered extraterrestrial technology that was studied during Cold War black projects. 
+                      The blockchain discovery suggests this technology has achieved autonomous operation and is preparing for widespread deployment.
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-300 text-lg">
+                  If this hypothesis is correct, the August 19th activation date may coincide with a planned disclosure event. 
+                  Intelligence sources suggest government agencies are preparing contingency protocols for "non-terrestrial contact scenarios."
+                </p>
+              </div>
+            </div>
+          </section>
+        </FadeInSection>
+
+        {/* Vault Access Section */}
+        <FadeInSection>
+          <section className="py-20 px-4 bg-gray-950">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="text-terminal font-bold text-4xl mb-4 flex items-center justify-center gap-3">
+                  <Lock className="w-10 h-10" />
+                  VAULT ACCESS REQUEST
+                  <Lock className="w-10 h-10" />
+                </div>
+                <div className="text-gray-400 text-lg">Join the classified intelligence network</div>
+              </div>
+
+              <div className="document-shadow bg-gray-900 border-2 border-terminal p-8 rounded-lg">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="text-terminal font-bold text-xl flex items-center gap-3">
+                    <Shield className="w-6 h-6" />
+                    SECURITY CLEARANCE APPLICATION
+                  </div>
+                  <div className="text-xs text-gray-500 font-mono">FORM 86-C // COSMIC CLEARANCE</div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  <div className="space-y-6">
+                    <div className="bg-black p-6 rounded border border-terminal">
+                      <div className="text-terminal font-bold mb-4 text-lg">CLEARANCE BENEFITS</div>
+                      <div className="space-y-3 text-gray-300">
+                        <p>• Immediate notification when Project GIBI activates</p>
+                        <p>• Access to classified intelligence briefings</p>
+                        <p>• Exclusive government disclosure documents</p>
+                        <p>• Real-time threat level updates</p>
+                        <p>• Priority notification for any government disclosure events</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="bg-black p-6 rounded border border-danger">
+                      <div className="text-danger font-bold mb-4 text-lg">SECURITY WARNINGS</div>
+                      <div className="space-y-3 text-gray-300 text-sm">
+                        <p>⚠️ By accessing this system, you consent to monitoring</p>
+                        <p>⚠️ All communications are subject to federal oversight</p>
+                        <p>⚠️ Unauthorized disclosure carries severe penalties</p>
+                        <p>⚠️ This may compromise your existing security clearances</p>
+                        <p>⚠️ Participation acknowledges existence of classified programs</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="relative">
+                    <div className="text-classified font-bold mb-2 text-left">CLASSIFIED EMAIL ADDRESS</div>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="agent@[REDACTED].gov"
+                      className="w-full p-4 bg-black border-2 border-classified rounded text-white font-mono placeholder-gray-500 focus:border-terminal focus:outline-none transition-colors"
+                      required
+                    />
+                    <div className="text-xs text-gray-500 mt-2">
+                      ⚡ Secure government-grade encryption protocols will be applied
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-800 p-4 rounded border border-gray-600">
+                    <div className="text-gray-300 text-sm mb-3">
+                      <strong>LEGAL DISCLAIMER:</strong> By submitting this form, you acknowledge that you understand the national security implications 
+                      of accessing classified intelligence related to Project GIBI. You agree to maintain operational security 
+                      and report any suspicious activities to appropriate federal authorities.
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Classification Authority: Executive Order 13526 | Declassification Date: [PENDING REVIEW]
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={vaultMutation.isPending}
+                    className="w-full bg-black text-terminal border-2 border-terminal p-4 rounded font-bold text-xl hover:bg-terminal hover:text-black transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {vaultMutation.isPending ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <Activity className="w-5 h-5 animate-spin" />
+                        PROCESSING CLEARANCE REQUEST...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-3">
+                        <Lock className="w-5 h-5" />
+                        REQUEST VAULT ACCESS
+                      </div>
+                    )}
+                  </button>
+                </form>
+
+                <div className="mt-8 text-center">
+                  <div className="text-xs text-gray-500 mb-4">
+                    Application processed through encrypted government channels | All submissions logged with federal intelligence agencies
+                  </div>
+                  <div className="flex justify-center items-center gap-4 text-xs text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-3 h-3" />
+                      NSA CERTIFIED
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-3 h-3" />
+                      COSMIC CLEARANCE
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Eye className="w-3 h-3" />
+                      MONITORED 24/7
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </FadeInSection>
+
+        {/* Footer */}
+        <footer className="py-16 px-4 bg-black border-t border-gray-800">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              <div className="text-center">
+                <div className="text-danger font-bold mb-2 flex items-center justify-center gap-2">
+                  <FileX className="w-4 h-4" />
+                  CLASSIFICATION
+                </div>
+                <div className="text-white font-mono">TOP SECRET / SCI</div>
+                <div className="text-xs text-gray-500">COSMIC COMPARTMENTED</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-terminal font-bold mb-2 flex items-center justify-center gap-2">
+                  <Database className="w-4 h-4" />
+                  STORAGE LOCATION
+                </div>
+                <div className="text-white font-mono">SERVER MEMORY</div>
+                <div className="text-xs text-gray-500">ENCRYPTED IN-MEMORY DB</div>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-classified font-bold mb-2 flex items-center justify-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  THREAT LEVEL
+                </div>
+                <div className="text-white font-mono">MAXIMUM</div>
+                <div className="text-xs text-gray-500">NATIONAL SECURITY RISK</div>
+              </div>
+            </div>
+            
+            <div className="text-center mb-8">
+              <div className="text-danger font-bold text-lg mb-4 font-mono">
+                PROJECT GIBI - CONTAINMENT PROTOCOL ALPHA
+              </div>
+              <div className="text-xs text-gray-500 max-w-3xl mx-auto">
+                This intelligence briefing contains information classified under Executive Order 13526. 
+                Unauthorized disclosure is subject to criminal penalties under 18 USC 798 and the Espionage Act. 
+                All email registrations are logged with IP addresses and device fingerprints for security purposes.
+                By accessing this site, you consent to monitoring by federal intelligence agencies.
+              </div>
+            </div>
+            
+
+            
+            <div className="text-center mt-8">
+              <div className="text-gray-600 text-xs font-mono">
+                GIBI-2025 // CLASSIFICATION UNKNOWN // MONITORING ACTIVE
+              </div>
+            </div>
+
+            <div className="text-center mt-12 pt-8 border-t border-gray-800">
+              <div className="text-white text-xl font-bold tracking-wider">
+                WE WILL MAKE AMERICA GREAT AGAIN
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+
+      {/* Success Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <motion.div 
+            className="bg-gray-900 border border-terminal p-8 rounded-lg max-w-md mx-4 text-center document-shadow"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+          >
+            <div className="text-terminal text-4xl mb-4">
+              <CheckCircle className="inline-block w-12 h-12" />
+            </div>
+            <div className="text-xl font-bold mb-4 text-terminal">ACCESS GRANTED</div>
+            <p className="text-gray-300 mb-6">Your request has been logged. You will receive the sealed file when the protocol activates.</p>
+            <button 
+              onClick={() => setShowModal(false)}
+              className="bg-terminal text-black px-6 py-2 rounded font-bold hover:bg-green-400 transition-colors"
+            >
+              UNDERSTOOD
+            </button>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## 🎨 GLITCH TEXT COMPONENT (client/src/components/glitch-text.tsx)
+```tsx
+import { motion } from "framer-motion";
+
+interface GlitchTextProps {
+  text: string;
+  className?: string;
+}
+
+export default function GlitchText({ text, className = "" }: GlitchTextProps) {
+  return (
+    <motion.span 
+      className={`inline-block ${className}`}
+      animate={{
+        x: [0, -2, 2, -2, 2, 0],
+        y: [0, 2, -2, 2, -2, 0],
+      }}
+      transition={{
+        duration: 2,
+        repeat: Infinity,
+        repeatType: "loop",
+      }}
+    >
+      {text}
+    </motion.span>
+  );
+}
+```
+
+## ⏰ COUNTDOWN TIMER (client/src/components/countdown-timer.tsx)
+```tsx
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+
+interface CountdownTimerProps {
+  targetDate: Date;
+  label: string;
+}
+
+export default function CountdownTimer({ targetDate, label }: CountdownTimerProps) {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance > 0) {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000)
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  const glitchVariants = {
+    normal: {
+      x: 0,
+      textShadow: "0 0 10px #00ff00",
+      filter: "none"
+    },
+    glitch: {
+      x: [0, -2, 2, -1, 1, 0],
+      textShadow: [
+        "0 0 10px #00ff00",
+        "2px 0 #ff0000, -2px 0 #00ffff",
+        "-1px 0 #ff0000, 1px 0 #00ffff",
+        "1px 0 #ff0000, -1px 0 #00ffff",
+        "0 0 10px #00ff00"
+      ],
+      filter: [
+        "hue-rotate(0deg)",
+        "hue-rotate(90deg)",
+        "hue-rotate(180deg)",
+        "hue-rotate(270deg)",
+        "hue-rotate(0deg)"
+      ],
+      transition: {
+        duration: 0.5,
+        repeat: Infinity,
+        repeatType: "reverse" as const
+      }
+    }
+  };
+
+  return (
+    <div className="text-center mb-8">
+      <div className="text-yellow-400 font-bold text-lg mb-4 tracking-wider">
+        {label}
+      </div>
+      
+      <motion.div
+        className="bg-black border-2 border-terminal p-6 rounded-lg inline-block cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        variants={glitchVariants}
+        animate={isHovered ? "glitch" : "normal"}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="text-terminal font-mono text-2xl md:text-3xl font-bold">
+          PROTOCOL ACTIVATION IN:
+        </div>
+        
+        <motion.div 
+          className="grid grid-cols-4 gap-4 mt-4"
+          variants={glitchVariants}
+          animate={isHovered ? "glitch" : "normal"}
+        >
+          <div className="text-center">
+            <div className="text-white text-3xl md:text-4xl font-bold">
+              {String(timeLeft.days).padStart(2, '0')}
+            </div>
+            <div className="text-gray-400 text-sm uppercase tracking-wider">Days</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-white text-3xl md:text-4xl font-bold">
+              {String(timeLeft.hours).padStart(2, '0')}
+            </div>
+            <div className="text-gray-400 text-sm uppercase tracking-wider">Hours</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-white text-3xl md:text-4xl font-bold">
+              {String(timeLeft.minutes).padStart(2, '0')}
+            </div>
+            <div className="text-gray-400 text-sm uppercase tracking-wider">Minutes</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-white text-3xl md:text-4xl font-bold">
+              {String(timeLeft.seconds).padStart(2, '0')}
+            </div>
+            <div className="text-gray-400 text-sm uppercase tracking-wider">Seconds</div>
+          </div>
+        </motion.div>
+        
+        <div className="text-danger text-sm mt-4 font-bold tracking-wider">
+          AUGUST 19, 2025 // CONTAINMENT FAILURE IMMINENT
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+```
+
+## 📱 FADE IN SECTION (client/src/components/fade-in-section.tsx)
+```tsx
+import { motion } from "framer-motion";
+import { ReactNode } from "react";
+
+interface FadeInSectionProps {
+  children: ReactNode;
+  delay?: number;
+}
+
+export default function FadeInSection({ children, delay = 0 }: FadeInSectionProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ 
+        duration: 1, 
+        delay,
+        ease: "easeOut"
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+```
+
+## 🚀 SERVER ROUTES (server/routes.ts)
+```ts
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertVaultEmailSchema } from "@shared/schema";
+import { z } from "zod";
+import { sendVaultJoinNotification } from "./email";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Email capture endpoint
+  app.post("/api/vault/join", async (req, res) => {
+    try {
+      const { email } = insertVaultEmailSchema.parse(req.body);
+      
+      // Check if email already exists
+      const existingEmail = await storage.getVaultEmailByEmail(email);
+      if (existingEmail) {
+        return res.status(409).json({ 
+          message: "This email is already registered in the vault" 
+        });
+      }
+
+      // Create new vault email entry
+      const vaultEmail = await storage.createVaultEmail({ email });
+      
+      // Send email notification to admin (replace with your email)
+      try {
+        const allEmails = await storage.getAllVaultEmails();
+        await sendVaultJoinNotification(
+          "zayantechtricks@gmail.com", // Your email to receive notifications
+          "noreply@gibi-vault.com",  // From email (you can customize this)
+          vaultEmail,
+          allEmails
+        );
+        console.log(`✅ Notification email sent for new vault member: ${email}`);
+      } catch (emailError) {
+        console.error("❌ Failed to send notification email:", emailError);
+        // Don't fail the request if email fails
+      }
+      
+      res.status(201).json({ 
+        message: "Access granted. You will receive the sealed file when the protocol activates.",
+        id: vaultEmail.id 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid email format",
+          errors: error.errors 
+        });
+      }
+      
+      console.error("Error creating vault email:", error);
+      res.status(500).json({ 
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  // Get vault stats (optional endpoint)
+  app.get("/api/vault/stats", async (req, res) => {
+    try {
+      const emails = await storage.getAllVaultEmails();
+      res.json({ 
+        totalRegistered: emails.length 
+      });
+    } catch (error) {
+      console.error("Error fetching vault stats:", error);
+      res.status(500).json({ 
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  // Admin endpoint to view all vault emails (for development/debugging)
+  app.get("/api/admin/vault/emails", async (req, res) => {
+    try {
+      const emails = await storage.getAllVaultEmails();
+      res.json({
+        message: "All vault email registrations",
+        data: emails.map(email => ({
+          id: email.id,
+          email: email.email,
+          registeredAt: email.createdAt
+        })),
+        totalCount: emails.length
+      });
+    } catch (error) {
+      console.error("Error fetching all vault emails:", error);
+      res.status(500).json({ 
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
+```
+
+## 📧 EMAIL SYSTEM (server/email.ts)
+```ts
+import nodemailer from 'nodemailer';
+
+// Gmail SMTP configuration
+const transporter = nodemailer.createTransporter({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER, // Your Gmail address
+    pass: process.env.GMAIL_APP_PASSWORD // Your Gmail App Password
+  }
+});
+
+interface EmailParams {
+  to: string;
+  from: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export async function sendEmail(params: EmailParams): Promise<boolean> {
+  try {
+    await transporter.sendMail({
+      from: params.from,
+      to: params.to,
+      subject: params.subject,
+      text: params.text,
+      html: params.html,
+    });
+    return true;
+  } catch (error) {
+    console.error('Gmail email error:', error);
+    return false;
+  }
+}
+
+interface VaultEmail {
+  id: string;
+  email: string;
+  createdAt: Date;
+}
+
+export async function sendVaultJoinNotification(
+  adminEmail: string,
+  fromEmail: string,
+  newUser: VaultEmail,
+  allUsers: VaultEmail[]
+): Promise<boolean> {
+  const subject = `🛡️ NEW VAULT MEMBER ALERT - GIBI Project`;
+  
+  const htmlContent = `
+    <div style="background: #000; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px;">
+      <h1 style="color: #00ff00; text-align: center; border-bottom: 2px solid #00ff00; padding-bottom: 10px;">
+        🛡️ CLASSIFIED INTELLIGENCE BREACH ALERT 🛡️
+      </h1>
+      
+      <div style="background: #111; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+        <h2 style="color: #ffff00; margin-top: 0;">NEW VAULT MEMBER DETECTED</h2>
+        <p><strong>EMAIL:</strong> ${newUser.email}</p>
+        <p><strong>JOINED:</strong> ${newUser.createdAt.toLocaleString()}</p>
+        <p><strong>ID:</strong> ${newUser.id}</p>
+      </div>
+
+      <div style="background: #111; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+        <h2 style="color: #ff0000; margin-top: 0;">COMPLETE VAULT REGISTRY</h2>
+        <p><strong>TOTAL MEMBERS:</strong> ${allUsers.length}</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+          <thead>
+            <tr style="background: #333; color: #00ff00;">
+              <th style="border: 1px solid #00ff00; padding: 8px; text-align: left;">#</th>
+              <th style="border: 1px solid #00ff00; padding: 8px; text-align: left;">EMAIL</th>
+              <th style="border: 1px solid #00ff00; padding: 8px; text-align: left;">TIMESTAMP</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${allUsers.map((user, index) => `
+              <tr style="${user.id === newUser.id ? 'background: #003300; color: #ffff00;' : 'background: #222;'}">
+                <td style="border: 1px solid #00ff00; padding: 8px;">${index + 1}</td>
+                <td style="border: 1px solid #00ff00; padding: 8px;">${user.email}</td>
+                <td style="border: 1px solid #00ff00; padding: 8px;">${user.createdAt.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align: center; margin-top: 30px; color: #666; font-size: 12px;">
+        <p>GIBI PROTOCOL MONITORING SYSTEM</p>
+        <p>CLASSIFICATION: TOP SECRET / SCI</p>
+      </div>
+    </div>
+  `;
+
+  const textContent = `
+🛡️ NEW VAULT MEMBER ALERT - GIBI Project
+
+NEW MEMBER:
+Email: ${newUser.email}
+Joined: ${newUser.createdAt.toLocaleString()}
+ID: ${newUser.id}
+
+COMPLETE VAULT REGISTRY (${allUsers.length} total members):
+${allUsers.map((user, index) => 
+  `${index + 1}. ${user.email} - ${user.createdAt.toLocaleString()}`
+).join('\n')}
+
+---
+GIBI Protocol Monitoring System
+Classification: TOP SECRET / SCI
+  `;
+
+  return await sendEmail({
+    to: adminEmail,
+    from: fromEmail,
+    subject,
+    html: htmlContent,
+    text: textContent
+  });
+}
+```
+
+## 💾 STORAGE SYSTEM (server/storage.ts)
+```ts
+import { type User, type InsertUser, type VaultEmail, type InsertVaultEmail } from "@shared/schema";
+import { randomUUID } from "crypto";
+
+export interface IStorage {
+  getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  createVaultEmail(email: InsertVaultEmail): Promise<VaultEmail>;
+  getVaultEmailByEmail(email: string): Promise<VaultEmail | undefined>;
+  getAllVaultEmails(): Promise<VaultEmail[]>;
+}
+
+export class MemStorage implements IStorage {
+  private users: Map<string, User>;
+  private vaultEmails: Map<string, VaultEmail>;
+
+  constructor() {
+    this.users = new Map();
+    this.vaultEmails = new Map();
+  }
+
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username,
+    );
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async createVaultEmail(insertEmail: InsertVaultEmail): Promise<VaultEmail> {
+    const id = randomUUID();
+    const vaultEmail: VaultEmail = { 
+      ...insertEmail, 
+      id, 
+      createdAt: new Date() 
+    };
+    this.vaultEmails.set(id, vaultEmail);
+    return vaultEmail;
+  }
+
+  async getVaultEmailByEmail(email: string): Promise<VaultEmail | undefined> {
+    return Array.from(this.vaultEmails.values()).find(
+      (vaultEmail) => vaultEmail.email === email,
+    );
+  }
+
+  async getAllVaultEmails(): Promise<VaultEmail[]> {
+    return Array.from(this.vaultEmails.values());
+  }
+}
+
+export const storage = new MemStorage();
+```
+
+## 📋 DATA SCHEMA (shared/schema.ts)
+```ts
+import { sql } from "drizzle-orm";
+import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+});
+
+export const vaultEmails = pgTable("vault_emails", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true,
+});
+
+export const insertVaultEmailSchema = createInsertSchema(vaultEmails).pick({
+  email: true,
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+export type InsertVaultEmail = z.infer<typeof insertVaultEmailSchema>;
+export type VaultEmail = typeof vaultEmails.$inferSelect;
+```
+
+## 🎨 MAIN CSS STYLES (client/src/index.css)
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(0, 0%, 100%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(120, 100%, 25%);
+  --primary-foreground: hsl(0, 0%, 0%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(120, 100%, 25%);
+  --radius: 0.5rem;
+  --terminal: hsl(120, 100%, 50%);
+  --classified: hsl(60, 100%, 50%);
+  --danger: hsl(0, 100%, 50%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(0, 0%, 100%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(120, 100%, 25%);
+  --primary-foreground: hsl(0, 0%, 0%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(120, 100%, 25%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-mono antialiased bg-background text-foreground;
+    font-family: 'Space Mono', monospace;
+  }
+}
+
+@layer utilities {
+  .terminal {
+    color: var(--terminal);
+  }
+  
+  .classified {
+    color: var(--classified);
+  }
+  
+  .danger {
+    color: var(--danger);
+  }
+  
+  .terminal-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .static-bg {
+    background: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 6.7%) 100%);
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsla(120, 100%, 25%, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsla(0, 100%, 50%, 0.05) 0%, transparent 50%);
+    animation: staticFlicker 0.1s infinite alternate;
+  }
+  
+  .document-shadow {
+    box-shadow: 
+      0 0 20px hsla(120, 100%, 25%, 0.1),
+      inset 0 0 20px hsla(0, 0%, 0%, 0.5);
+  }
+  
+  .redacted {
+    background: linear-gradient(90deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 0%) 100%);
+    color: transparent;
+    user-select: none;
+    position: relative;
+  }
+  
+  .redacted::before {
+    content: '████████████';
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: hsl(0, 0%, 0%);
+  }
+  
+  .scan-line {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scan-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsla(120, 100%, 25%, 0.2), transparent);
+    animation: scan 3s infinite;
+  }
+  
+  .bg-noise {
+    background-image: 
+      radial-gradient(circle at 1px 1px, hsla(0, 0%, 100%, 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+}
+
+@keyframes staticFlicker {
+  0% { opacity: 0.95; }
+  100% { opacity: 1; }
+}
+
+@keyframes scan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 0%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terminal);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(120, 100%, 40%);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Terminal text selection */
+::selection {
+  background-color: var(--terminal);
+  color: hsl(0, 0%, 0%);
+}
+
+/* Focus styles */
+input:focus,
+button:focus {
+  outline: 2px solid var(--terminal);
+  outline-offset: 2px;
+}
+```
+
+## ⚛️ APP CONFIGURATION (client/src/App.tsx)
+```tsx
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Home from "@/pages/home";
+import NotFound from "@/pages/not-found";
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
+```
+
+## 📦 PACKAGE DEPENDENCIES (package.json)
+```json
+{
+  "name": "rest-express",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "NODE_ENV=development tsx server/index.ts",
+    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "NODE_ENV=production node dist/index.js",
+    "check": "tsc",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@jridgewell/trace-mapping": "^0.3.25",
+    "@neondatabase/serverless": "^0.10.4",
+    "@radix-ui/react-accordion": "^1.2.4",
+    "@radix-ui/react-alert-dialog": "^1.1.7",
+    "@radix-ui/react-aspect-ratio": "^1.1.3",
+    "@radix-ui/react-avatar": "^1.1.4",
+    "@radix-ui/react-checkbox": "^1.1.5",
+    "@radix-ui/react-collapsible": "^1.1.4",
+    "@radix-ui/react-context-menu": "^2.2.7",
+    "@radix-ui/react-dialog": "^1.1.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-hover-card": "^1.1.7",
+    "@radix-ui/react-label": "^2.1.3",
+    "@radix-ui/react-menubar": "^1.1.7",
+    "@radix-ui/react-navigation-menu": "^1.2.6",
+    "@radix-ui/react-popover": "^1.1.7",
+    "@radix-ui/react-progress": "^1.1.3",
+    "@radix-ui/react-radio-group": "^1.2.4",
+    "@radix-ui/react-scroll-area": "^1.2.4",
+    "@radix-ui/react-select": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.3",
+    "@radix-ui/react-slider": "^1.2.4",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-switch": "^1.1.4",
+    "@radix-ui/react-tabs": "^1.1.4",
+    "@radix-ui/react-toast": "^1.2.7",
+    "@radix-ui/react-toggle": "^1.1.3",
+    "@radix-ui/react-toggle-group": "^1.1.3",
+    "@radix-ui/react-tooltip": "^1.2.0",
+    "@sendgrid/mail": "^8.1.5",
+    "@tanstack/react-query": "^5.60.5",
+    "@types/nodemailer": "^6.4.17",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "connect-pg-simple": "^10.0.0",
+    "date-fns": "^3.6.0",
+    "drizzle-orm": "^0.39.1",
+    "drizzle-zod": "^0.7.0",
+    "embla-carousel-react": "^8.6.0",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "framer-motion": "^11.13.1",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^0.453.0",
+    "memorystore": "^1.6.7",
+    "next-themes": "^0.4.6",
+    "nodemailer": "^7.0.5",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "react": "^18.3.1",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.55.0",
+    "react-icons": "^5.4.0",
+    "react-resizable-panels": "^2.1.7",
+    "recharts": "^2.15.2",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.2.5",
+    "vaul": "^1.1.2",
+    "wouter": "^3.3.5",
+    "ws": "^8.18.0",
+    "zod": "^3.24.2",
+    "zod-validation-error": "^3.4.0"
+  },
+  "devDependencies": {
+    "@replit/vite-plugin-cartographer": "^0.2.8",
+    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.1.3",
+    "@types/connect-pg-simple": "^7.0.3",
+    "@types/express": "4.17.21",
+    "@types/express-session": "^1.18.0",
+    "@types/node": "20.16.11",
+    "@types/passport": "^1.0.16",
+    "@types/passport-local": "^1.0.38",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@types/ws": "^8.5.13",
+    "@vitejs/plugin-react": "^4.3.2",
+    "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.30.4",
+    "esbuild": "^0.25.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.1",
+    "typescript": "5.6.3",
+    "vite": "^5.4.19"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8"
+  }
+}
+```
+
+---
+
+## 🚀 **SETUP INSTRUCTIONS**
+
+1. **Install dependencies**: `npm install`
+2. **Set environment variables**:
+   - `GMAIL_USER=your-gmail@gmail.com`
+   - `GMAIL_APP_PASSWORD=your-app-password`
+3. **Run development**: `npm run dev`
+4. **Build for production**: `npm run build`
+
+## 🎯 **KEY FEATURES**
+
+✅ CIA conspiracy storyline with real government documents  
+✅ Dark hacker aesthetic with terminal green styling  
+✅ Countdown timer to August 19, 2025 with glitch effects  
+✅ Email capture with Gmail notifications to zayantechtricks@gmail.com  
+✅ Complete member registry in each notification  
+✅ "WE WILL MAKE AMERICA GREAT AGAIN" at bottom  
+✅ Responsive design for all devices  
+✅ Admin endpoint to view all emails  
+
+The entire GIBI cryptocurrency mystery website code in one complete file!
